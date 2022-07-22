@@ -22,6 +22,15 @@ let Funciones = class{
     nuevoProducto = async() =>{
         let array = this.Path.split('/');
         let name = array[array.length -1];
+
+        // 'file' comes from the Blob or File API
+        storage.ref('pizzas').child('imagenes/'+ name).put(this.Blob).then((snapshot) => {
+            console.log('Uploaded a base64 or file!');
+        }).catch((result) =>{
+            console.log('Error: ' + result)
+        });
+
+
         console.log( 'nombre ' + this.nombre)
         console.log( 'tamaño ' + this.tamano)
         console.log( 'precio ' + this.precio)
@@ -38,12 +47,7 @@ let Funciones = class{
             console.log('Error: ' + result);
         })
 
-        // 'file' comes from the Blob or File API
-        storage.ref('pizzas').child('imagenes/'+ name).put(this.Blob).then((snapshot) => {
-            console.log('Uploaded a base64 or file!');
-        }).catch((result) =>{
-            console.log('Error: ' + result)
-        });
+  
      }
    
     

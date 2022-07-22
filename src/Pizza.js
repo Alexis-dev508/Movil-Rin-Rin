@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import {View, Button, Text, TextInput, StyleSheet, ScrollView, FlatList} from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 import  firebase  from './database/firebase';
+import Pelicula from './Pelicula';
 
 export default function Pizza({navigation}){
     const db = firebase.db;
     const auth = firebase.auth;
     const storage = firebase.firebase.storage();
-
-
     let [productos, setProductos] = useState([])
 
    const productosFunc = (tipo) =>{
@@ -33,15 +33,16 @@ export default function Pizza({navigation}){
        
    
    
-    return(
-        <View>
-            {
-                 productos.forEach(element => {
-                    console.log(element.nombre)
-                 })
-            }
-            
-        </View>
+   return(
+    <ScrollView>
         
-    )
+            <View style = {{color: 'red'}}>
+            { productos.map( (p) => (
+                <Pelicula key={p.id} nombre ={p.nombre} precio={p.precio}/>
+            ) )}
+            </View>
+           
+          
+    </ScrollView> 
+    );
 }
