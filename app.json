@@ -4,7 +4,11 @@
     "slug": "prueba2",
     "version": "1.0.0",
     "assetBundlePatterns": [
-      "**/*"
-    ]
+      "assets/*"
+    ],
+    "android":{
+      "package": "com.utesc.rinrin",
+      "versionCode": 1
+    }
   }
 }

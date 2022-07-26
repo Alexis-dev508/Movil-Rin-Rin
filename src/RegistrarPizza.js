@@ -28,7 +28,7 @@ export default function RegistrarPizza({navigation}){
             nombrePizza: state.nombrePizza,
             tamañoPizza: state.tamanoPizza,
             precioPizza: state.precioPizza,
-            ingredientesPizza: state.ingredientesPizza
+            ingredientesPizza: state.ingredientesPizza,
         }).then((result) =>{
             console.log('Pizza agregada!!');
 

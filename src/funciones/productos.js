@@ -7,39 +7,44 @@ const storage = firebase.firebase.storage();
 
 
 
-let Funciones = class{
+let Productos =  class{
     constructor(nombre, tamano, precio, ingredientes, tipo, Path){
         this.nombre = nombre,
         this.tamano = tamano,
         this.precio = precio,
         this.ingredientes = ingredientes,
         this.tipo = tipo,
-        this.Path = Path,
-        this.Blob = fetch(Path).then(r => r.blob())
-       
+        this.Path = Path
     }
     
     nuevoProducto = async() =>{
         let array = this.Path.split('/');
         let name = array[array.length -1];
-
+        var Blob = await fetch(this.Path).then(r => r.blob())
+        var downloadUrl = ''
         // 'file' comes from the Blob or File API
-        storage.ref('pizzas').child('imagenes/'+ name).put(this.Blob).then((snapshot) => {
-            console.log('Uploaded a base64 or file!');
-        }).catch((result) =>{
-            console.log('Error: ' + result)
-        });
+       await storage.ref('pizzas').child('imagenes/'+ name).put(Blob).then(async function(snapshot) {
+            await snapshot.ref.getDownloadURL().then(function(imgurl){
+                downloadUrl = imgurl
+                console.log(`Enlace de descarga de la imagen: ${downloadUrl} imgurl: ${imgurl}` )
+                console.log('Uploaded a base64 or file!');
+            })
+           
+        })
 
 
         console.log( 'nombre ' + this.nombre)
         console.log( 'tamaño ' + this.tamano)
         console.log( 'precio ' + this.precio)
         console.log( 'ingredientes ' +this.ingredientes)
+       
+        console.log('direccion de descarga: ' + downloadUrl)       
         await db.collection(this.tipo).doc().set({
             nombrePizza: this.nombre,
             tamañoPizza: this.tamano,
             precioPizza: this.precio,
-            ingredientesPizza: this.ingredientes
+            ingredientesPizza: this.ingredientes,
+            downloadUrl: downloadUrl
         }).then((result) =>{
             console.log( this.tipo + ' agregada!!');
 
@@ -49,7 +54,8 @@ let Funciones = class{
 
   
      }
+     
    
     
 }
-export default Funciones
+export default Productos

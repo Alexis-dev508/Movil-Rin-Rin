@@ -9,36 +9,41 @@ export default function Pizza({navigation}){
     const auth = firebase.auth;
     const storage = firebase.firebase.storage();
     let [productos, setProductos] = useState([])
+    let productosP = []
 
-   const productosFunc = (tipo) =>{
-    db.collection(tipo).get().then((querySnapshot) => {
+   const productosFunc = async(tipo) =>{
+    await db.collection(tipo).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
        
             let producto ={
-                id: doc.id,
+                key: doc.id,
                 nombre: doc.data().nombrePizza,
                 precio: doc.data().precioPizza,
                 tamano: doc.data().tamañoPizza,
-                ingredientes: doc.data().ingredientes
+                ingredientes: doc.data().ingredientes,
+                downloadUrl: doc.data().downloadUrl
             }
-            productos.push(producto)
+            productosP.push(producto)
             
         });
+        setProductos(productosP)
     });
    }
 
-   useEffect(()=>{
-    productosFunc('pizzas')
-   }, [])
+   
        
    
    
    return(
     <ScrollView>
-        
-            <View style = {{color: 'red'}}>
+        {
+            useEffect(()=>{
+                productosFunc('pizzas')
+               }, [2])
+        }
+            <View style = {estilos.body}>
             { productos.map( (p) => (
-                <Pelicula key={p.id} nombre ={p.nombre} precio={p.precio}/>
+                <Pelicula key={p.key} nombre ={p.nombre} precio={p.precio} downloadUrl= {p.downloadUrl}/>
             ) )}
             </View>
            
@@ -46,3 +51,10 @@ export default function Pizza({navigation}){
     </ScrollView> 
     );
 }
+const estilos = StyleSheet.create({
+    body:{
+        flex:1,
+        alignItems: 'center',
+        flexDirection: 'row'
+    }
+})

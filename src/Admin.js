@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react';
-import {View, Button, Text, TextInput, StyleSheet, ScrollView, Modal, Alert, TouchableOpacity} from 'react-native';
+import {View, Button, Text, TextInput, StyleSheet, ScrollView, Modal, Alert, TouchableOpacity, FlatList, StatusBar, Image, KeyboardAvoidingView} from 'react-native';
 import { Table, TableWrapper, Row, Rows, Col, Cols, Cell } from 'react-native-table-component';
 import { Ionicons, FontAwesome5, Foundation, AntDesign } from 'react-native-vector-icons';
 import  firebase  from './database/firebase';
-import Funciones, * as funciones from './funciones/funciones'
+import Productos, * as funciones from './funciones/productos'
 import * as ImagePicker from 'expo-image-picker';
 import { setStatusBarTranslucent } from 'expo-status-bar';
 
@@ -12,7 +12,76 @@ const Admin = ({navigation}) =>{
     const db = firebase.db;
     const auth = firebase.auth;
     const storage = firebase.firebase.storage();
-  
+    const [data2, setData2] = useState([]);
+    const [dataPedido, setDataPedido] = useState([]);
+    var data=[];
+    var dataP=[];
+
+
+      const Item = ({ folio, nombrePizza, cantidadPizza, callePrincipal, calle1, calle2, colorCasa, numeroCasa, nombreCliente}) => (
+        
+            <View style={styles.item}>
+                <TouchableOpacity>
+                    <View><Text style={styles.text}><Text style={estilos.label}>Folio:</Text> {folio}</Text></View>
+                    <View><Text style={styles.text}><Text style={estilos.label}>Pizza:</Text> {nombrePizza}</Text></View>
+                    <View><Text style={styles.text}><Text style={estilos.label}>Cantidad:</Text> {cantidadPizza}</Text></View>
+                    <View><Text style={styles.text}><Text style={estilos.label}>Domicilio:</Text> {callePrincipal} entre {calle1} y {calle2}</Text></View>
+                    <View><Text style={styles.text}><Text style={estilos.label}>Color:</Text> {colorCasa}</Text></View>
+                    <View><Text style={styles.text}><Text style={estilos.label}>Número:</Text> {numeroCasa}</Text></View>
+                    <View><Text style={styles.text}><Text style={estilos.label}>Cliente:</Text> {nombreCliente}</Text></View>
+                </TouchableOpacity>
+            </View>
+        
+      );
+
+
+      const renderItem =  ({ item }) => (
+        <Item folio= {item.key} nombrePizza={item.nombrePizza} cantidadPizza={item.cantidadPizza} callePrincipal={item.callePrincipal} calle1={item.entreCalle1} calle2={item.entreCalle2} colorCasa={item.colorCasa} numeroCasa={item.numeroCasa} nombreCliente={item.nombreCliente}/>
+      );
+
+      const productosFunc = async(tipo) =>{
+       await db.collection(tipo).get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+           
+                let producto ={
+                    key: doc.id,
+                    nombre: doc.data().nombrePizza,
+                    precio: doc.data().precioPizza,
+                    tamano: doc.data().tamañoPizza,
+                    ingredientes: doc.data().ingredientes,
+                    downloadUrl: doc.data().downloadUrl
+                }
+              data.push(producto)
+                
+            });
+            setData2(data)
+        });
+       }
+       const pedidosFunc = async(tipo) =>{
+        await db.collection(tipo).get().then((querySnapshot) => {
+             querySnapshot.forEach((doc) => {
+            
+                 let pedido ={
+                    key: doc.id,
+                    callePrincipal:doc.data().callePrincipal,
+                    cantidadPizza: doc.data().cantidadPizza,
+                    colorCasa: doc.data().colorCasa,
+                    entreCalle1: doc.data().entreCalle1,                
+                    entreCalle2: doc.data().entreCalle2,            
+                    nombreCliente: doc.data().nombreCliente,           
+                    nombrePizza: doc.data().nombrePizza,
+                    notasExtra: doc.data().notasExtra,
+                    numeroCasa: doc.data().numeroCasa,
+                    tipo: doc.data().tipo,
+                    total: doc.data().total
+                    
+                 }
+               dataP.push(pedido)
+                 
+             });
+             setDataPedido(dataP)
+         });
+        }
 
     const [state, setState] = useState({
         nombre:'',
@@ -27,14 +96,9 @@ const Admin = ({navigation}) =>{
         productoPrecioArray: [],
         productoIngredientesArray: [],
     });
-    const [productoId, setProductoId] = useState([]);
-    const [productoNombre, setProductoNombre] = useState([]);
-    const [productoTamano, setProductoTamano] = useState([]);
-    const [productoPrecio, setProductoPrecio] = useState([]);
-    const [productoIngredientes, setProductoIngredientes] = useState([]);
-    const [extencion, setExtencion] = useState("");
+   
     const [Path, setPath] = useState('');
-    const [File, setFile] = useState('');
+
 
     const seleccionarImagen = async () => {
         let options = {
@@ -43,79 +107,41 @@ const Admin = ({navigation}) =>{
             base64:true,
             // allowsEditing: true
         }
-        let resultado = await ImagePicker.launchImageLibraryAsync(options)
+        let resultado = await ImagePicker.launchImageLibraryAsync()
         if (!resultado.cancelled){
             let ext = resultado.uri.split('.').pop();
             // setImagenBase64(resultado.base64);
             setPath(resultado.uri);
-            setExtencion(ext)
-        }
-    }
-
-
-   const traerProducto = async (tipo)=>{
-        let productoId = [];
-        let productoNombre = [];
-        let productoTamano = [];
-        let productoPrecio = [];
-        let productoIngredientes = [];
-       await db.collection(tipo).get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                productoId.push(doc.id);
-                productoNombre.push(doc.data().nombrePizza);
-                productoTamano.push(doc.data().tamanoPizza);
-                productoPrecio.push(doc.data().precioPizza);
-                productoIngredientes.push(doc.data().ingredientesPizza);
-                
-            });
-            setProductoId(productoId)
-            setProductoNombre(productoNombre)
-            setProductoTamano(productoTamano)
-            setProductoPrecio(productoPrecio)
-            setState({...state,['productoNombreArray']:productoNombre})
-            setState({...state,['productoTamanoArray']:productoTamano})
-            setState({...state,['productoPrecioArray']:productoPrecio})
-            setState({...state,['productoIngredientesArray']:productoIngredientes})
             
-        });
-    
-      
-    }
-       
+        }
+    }   
 
     const handleTextChange = (name, value) =>{
         setState({...state,[name]:value})
     }
-
-    // 
-    useEffect(()=>{
-       traerProducto('pizzas')
-        console.log(productoId)
-        console.log(productoNombre)
-        tablaPizzas
-    }, [])
-    
-
-
-    const [tablaPizzas, setTablaPizzas] = useState({
-        
-        tableHead: ['#', 'Nombre', 'Piezas', 'Precio'],
-        tableData: [
-          [productoId]
-            
-        ]
-    })
     
     return(
+       
+        <View>
+             {
+            
+            useEffect(()=>{
+                pedidosFunc('pedidos')
+                console.log(dataP)
+                }, [])
+            
+        }
+                <Button title='Nueva Pizza' onPress={()=>{setState({...state, ['modalPizzaView']: true})}}/>
+        <View style={estilos.titleContainer}>
+                    <Text style={estilos.title}>Pedidos</Text>
+                </View>
+        <FlatList
+                data={dataPedido}
+                renderItem={renderItem}
+                keyExtractor={item => item.id}
+            />
         <ScrollView style={style.body}>
-            <Button title='Crear Pizza' style={style.button} onPress={()=> setState({...state,['modalPizzaView']:true})}/>
-            <Table borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
-                <Row data={tablaPizzas.tableHead} style={style.head}/>
-                <Rows data={tablaPizzas.tableData} style={style.text}/>
-            </Table>
-
-
-
+            
             <Modal 
                 animationType='slide'
                 onDismiss={()=> console.log('close')}
@@ -161,7 +187,7 @@ const Admin = ({navigation}) =>{
                         if(state.nombre == '' || state.precio == '' || state.tamano == '' || state.ingredientes == '' ){
                             Alert.alert('Ups!', 'Favor de llenar todos los campos antes de continuar')
                         }else{
-                            const funcion = new Funciones(state.nombre, state.tamano, state.precio, state.ingredientes, 'pizzas', Path);
+                            const funcion = new Productos(state.nombre, state.tamano, state.precio, state.ingredientes, 'pizzas', Path);
                             funcion.nuevoProducto()
                         }
                         
@@ -169,6 +195,7 @@ const Admin = ({navigation}) =>{
                 </View>
             </Modal>
         </ScrollView>
+        </View>
     )
 }
 export default Admin;
@@ -204,6 +231,45 @@ export const estilos = StyleSheet.create({
         justifyContent: 'flex-end',
         paddingHorizontal: 20,
     },
-    
+    label:{fontWeight: 'bold'},
+
+    titleContainer:{
+        width:'100%',
+        backgroundColor: '#58545B',
+        height: 50,
+
+        alignItems: 'center',
+        textAlignVertical: 'center',
+        borderBottomLeftRadius: 15,
+        borderBottomRightRadius: 15,
+    },
+    title: {
+        color: 'white',
+        fontWeight:'bold',
+        fontSize: 20,
+        opacity: 2,
+        marginTop: 9,
+        
+
+    },
     
 });
+const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      marginTop: StatusBar.currentHeight || 0,
+    },
+    item: {
+      backgroundColor: '#E1D5D9',
+      padding: 20,
+      marginVertical: 8,
+      marginHorizontal: 16,
+
+    },
+    title: {
+      fontSize: 32,
+    },
+    text:{
+        fontSize: 15,
+    }
+  });

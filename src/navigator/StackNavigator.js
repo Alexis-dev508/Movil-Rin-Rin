@@ -21,17 +21,17 @@ function StackNavigator() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarStyle: {
-            backgroundColor: "#1C252C",
+            backgroundColor: "#E00004",
             color: "",
           },
           tabBarIcon: ({ focused, color, size }) => {
             let iconName;
 
-            if (route.name === "RinRinPizza") {
+            if (route.name === "Rin Rin Pizza") {
               iconName = focused
                 ? "ios-information-circle"
                 : "ios-information-circle-outline";
-              return <FontAwesome5 name="pizza-slice" size={24} color="red" />;
+              return <FontAwesome5 name="pizza-slice" size={24} color="#E0DD18" />;
             } else if (route.name === "RinRinRegistrar") {
               iconName = focused ? "ios-list-box" : "ios-list";
               return <FontAwesome5 name="kiwi-bird" size={24} color="red" />;
@@ -49,12 +49,13 @@ function StackNavigator() {
 
             // You can return any component that you like here!
           },
-          tabBarActiveTintColor: "red",
+          tabBarActiveTintColor: "#E0DD18",
           tabBarInactiveTintColor: "white",
         })}
       >
-        <Tab.Screen name="Feed" component={DetalleProducto} />
-        <Tab.Screen name="Messages" component={Pizza} />
+        
+        <Tab.Screen name="Rin Rin Pizza" component={DetalleProducto} options={{headerStyle:{backgroundColor: '#E00004'},headerTitleStyle: {fontWeight: 'bold', color:'white'}, }}/>
+        <Tab.Screen name="Administrar" component={Admin} options={{headerStyle:{backgroundColor: '#E00004'},headerTitleStyle: {fontWeight: 'bold', color:'white'}, }}/>
       </Tab.Navigator>
     );
   }

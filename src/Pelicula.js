@@ -1,16 +1,22 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity } from "react-native"
+import { Text, View, StyleSheet, Image, TouchableOpacity, ImageBackground } from "react-native"
+import { black, white } from "react-native-paper/lib/typescript/styles/colors"
 // import * as Linking from 'expo-linking'
-export default function Pelicula({nombre, precio}){
+export default function Pelicula({nombre, precio, downloadUrl}){
    
  
     return(
         
-        <TouchableOpacity  activeOpacity={0.5}>
+        <TouchableOpacity style={estilos.opacityContainer}  activeOpacity={0.5}>
             <View style = {estilos.cardContainer} >
-      
-                <Text style={estilos.titulo}>{nombre}</Text>
-                <Text style={estilos.descripcion}>{precio}</Text>
+                    <Image source={{uri: downloadUrl}} resizeMode="cover"  style={{ width: '100%', height: '60%' }} />
 
+                    <View>
+                        <Text></Text>
+                    <Text style={estilos.titulo}>{nombre}</Text>
+                    <Text style={estilos.descripcion}>Precio:${precio}</Text>
+                    <Text></Text>
+                    </View>
+                    
             </View>
         </TouchableOpacity>
         
@@ -18,25 +24,34 @@ export default function Pelicula({nombre, precio}){
 }
 const estilos = StyleSheet.create({
     cardContainer:{
-        backgroundColor: 'white',
-        padding: 10,
-        margin: 10,
+        backgroundColor: '#1694E0',
         opacity: 0.9,
-        borderRadius: 15,
         top: 40,
         alignItems: 'center',
-        height:350,
+        height:300,
+        width:180,
+        maxWidth:300,
+        
+       
     },
     cardImage:{
         width:300,
-        maxHeight: 200,
+        maxHeight: 180,
+        paddingBottom: 10,
     },
     titulo:{
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
+        textAlign: "center",
+        color: 'white',
+        backfaceVisibility:'visible'
     },
     descripcion:{
         maxWidth: '90%',
-        textAlign: 'justify'
+        textAlign: 'center',
+        color: 'white',
+    },
+    opacityContainer:{
+        padding: 10
     }
 })
